@@ -13,12 +13,16 @@ from random import uniform
 # Specify the output directory for rendered images
 output_directory = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images"
 outputd4 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_4"
+outputd8 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_8"
 fp = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results"
 scene = bpy.context.scene
 camera = bpy.context.scene.camera
 camera_extr_dict = []
 numpics = 10
 camera_radius = 20#Distance from the central object
+res_x = 1920
+res_y = 1120
+
 
 # Create a new light datablock
 light_data = bpy.data.lights.new(name="MyLight", type='POINT')
@@ -158,18 +162,33 @@ for i in range(0, numpics):
     # Set the camera rotation using the quaternion
     bpy.context.scene.camera.rotation_euler = rot_quat.to_euler()
 
-    scene.render.resolution_percentage = 100
+    #scene.render.resolution_percentage = 100
+    scene.render.resolution_x = res_x
+    scene.render.resolution_y = res_y
     # Increment the file name for each image
     bpy.context.scene.render.filepath = join(output_directory, "render_{}.png".format(i + 1))
     # Render the image
     bpy.ops.render.render(write_still=True)
 
-## FOR DOWNSCALING IMAGES    
-    scene.render.resolution_percentage = 25
+## FOR DOWNSCALING IMAGES to 1/4th original    
+    #scene.render.resolution_percentage = 25
+    scene.render.resolution_x = res_x//4
+    scene.render.resolution_y = res_y//4
     bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
     bpy.context.scene.render.film_transparent = True
      # Increment the file name for each image
     bpy.context.scene.render.filepath = join(outputd4, "render_{}.png".format(i + 1))
+    # Render the image
+    bpy.ops.render.render(write_still=True)
+
+## FOR DOWNSCALING IMAGES to 1/8th original   
+    #scene.render.resolution_percentage = 12.5
+    scene.render.resolution_x = res_x//8
+    scene.render.resolution_y = res_y//8
+    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
+    bpy.context.scene.render.film_transparent = True
+     # Increment the file name for each image
+    bpy.context.scene.render.filepath = join(outputd8, "render_{}.png".format(i + 1))
     # Render the image
     bpy.ops.render.render(write_still=True)
 
