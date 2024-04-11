@@ -1,0 +1,38 @@
+╭─ options ─────────────────────────────────────────────────────────────────────────────────╮ ╭─ pipeline.datamanager.dataparser options ────────────────────────────────────────────────╮
+│ -h, --help              show this help message and exit                                   │ │ --data PATH             Directory or explicit json file path specifying location of      │
+╰───────────────────────────────────────────────────────────────────────────────────────────╯ │                         data. (default: .)                                               │
+                                                                                              │ --scale-factor FLOAT    How much to scale the camera origins by. (default: 1.0)          │
+                                                                                              │ --downscale-factor {None}|INT                                                            │
+                                                                                              │                         How much to downscale images. If not set, images are chosen such │
+                                                                                              │                         that the max dimension is <1600px. (default: None)               │
+                                                                                              │ --scene-scale FLOAT     How much to scale the region of interest by. (default: 1.0)      │
+                                                                                              │ --orientation-method {pca,up,vertical,none}                                              │
+                                                                                              │                         The method to use for orientation. (default: up)                 │
+                                                                                              │ --center-method {poses,focus,none}                                                       │
+                                                                                              │                         The method to use to center the poses. (default: poses)          │
+                                                                                              │ --auto-scale-poses {True,False}                                                          │
+                                                                                              │                         Whether to automatically scale the poses to fit in +/- 1         │
+                                                                                              │                         bounding box. (default: True)                                    │
+                                                                                              │ --eval-mode {fraction,filename,interval,all}                                             │
+                                                                                              │                                                                                          │
+                                                                                              │                                                                                          │
+                                                                                              │                         The method to use for splitting the dataset into train and eval. │
+                                                                                              │                         Fraction splits based on a percentage for train and the          │
+                                                                                              │                         remaining for eval. Filename splits based on filenames           │
+                                                                                              │                         containing train/eval. Interval uses every nth frame for eval.   │
+                                                                                              │                         All uses all the images for any split. (default: fraction)       │
+                                                                                              │ --train-split-fraction FLOAT                                                             │
+                                                                                              │                         The percentage of the dataset to use for training. Only used     │
+                                                                                              │                         when eval_mode is train-split-fraction. (default: 0.9)           │
+                                                                                              │ --eval-interval INT     The interval between frames to use for eval. Only used when      │
+                                                                                              │                         eval_mode is eval-interval. (default: 8)                         │
+                                                                                              │ --depth-unit-scale-factor FLOAT                                                          │
+                                                                                              │                         Scales the depth values to meters. Default value is 0.001 for a  │
+                                                                                              │                         millimeter to meter conversion. (default: 0.001)                 │
+                                                                                              │ --mask-color {None}|{FLOAT FLOAT FLOAT}                                                  │
+                                                                                              │                         Replace the unknown pixels with this color. Relevant if you have │
+                                                                                              │                         a mask but still sample everywhere. (default: None)              │
+                                                                                              │ --load-3D-points {True,False}                                                            │
+                                                                                              │                         Whether to load the 3D points from the colmap reconstruction.    │
+                                                                                              │                         (default: False)                                                 │
+                                                                                              ╰──────────────────────────────────────────────────────────────────────────────────────────╯
