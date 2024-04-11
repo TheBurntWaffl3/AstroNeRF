@@ -1,4 +1,6 @@
-#THIS VSCODE SCRIPT MUST BE RUN WITH THE BLENDER EXTENSION ADD ON, FAKE BLENDER MODULE IS ALSO REQUIRED
+#THIS VSCODE SCRIPT MUST BE RUN WITH THE BLENDER EXTENSION, FAKE BLENDER MODULE IS ALSO REQUIRED
+#Setup tutorial: https://www.youtube.com/watch?v=YUytEtaVrrc 
+#pip install fake-bpy-module-latest
 import bpy
 import os
 import math
@@ -11,9 +13,14 @@ from random import uniform
 
 #CameraData = bpy.data.texts["CameraData"].as_module()
 # Specify the output directory for rendered images
-output_directory = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images"
-outputd4 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_4"
-fp = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results"
+output_directory = r"C:\Users\kkdar\Desktop\Astronerf\results\images"
+outputd4 = r"C:\Users\kkdar\Desktop\Astronerf\results\images_4"
+outputd8 = r"C:\Users\kkdar\Desktop\Astronerf\results\images_4"
+fp = r"results"
+
+os.makedirs(output_directory, exist_ok=True)
+os.makedirs(outputd4, exist_ok=True)
+
 scene = bpy.context.scene
 camera = bpy.context.scene.camera
 camera_extr_dict = []
@@ -101,7 +108,7 @@ def get_camera_intrinsics(scene, camera):
             #'aabb_scale': scene.aabb
         }
 
-        return {'camera_angle_x': camera_angle_x} if scene.nerf else camera_intr_dict
+        return camera_intr_dict
 
 
 
@@ -125,11 +132,6 @@ def get_camera_extrinsics(camera, filepath):
 out_data = get_camera_intrinsics(scene, camera)
 out_data['frames'] = []
 obj = bpy.data.objects.get('model')
-# Create the output directory if it doesn't exist
-#if not exists(output_directory):
-#    os.makedirs(output_directory)
-
-
 
 # Set rendering settings
 bpy.context.scene.render.image_settings.file_format = 'PNG'
@@ -161,6 +163,7 @@ for i in range(0, numpics):
     scene.render.resolution_percentage = 100
     # Increment the file name for each image
     bpy.context.scene.render.filepath = join(output_directory, "render_{}.png".format(i + 1))
+    print(bpy.context.scene.render.filepath)
     # Render the image
     bpy.ops.render.render(write_still=True)
 
@@ -170,6 +173,15 @@ for i in range(0, numpics):
     bpy.context.scene.render.film_transparent = True
      # Increment the file name for each image
     bpy.context.scene.render.filepath = join(outputd4, "render_{}.png".format(i + 1))
+    # Render the image
+    bpy.ops.render.render(write_still=True)
+
+## FOR DOWNSCALING IMAGES    
+    scene.render.resolution_percentage = 12.5
+    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
+    bpy.context.scene.render.film_transparent = True
+     # Increment the file name for each image
+    bpy.context.scene.render.filepath = join(outputd8, "render_{}.png".format(i + 1))
     # Render the image
     bpy.ops.render.render(write_still=True)
 
