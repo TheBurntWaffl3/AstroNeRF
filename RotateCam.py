@@ -9,31 +9,43 @@ from math import radians, sin, cos
 from mathutils import Vector
 from random import uniform
 
-#CameraData = bpy.data.texts["CameraData"].as_module()
 # Specify the output directory for rendered images
-output_directory = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images"
+outputd1 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images"
+outputd2 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_2"
 outputd4 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_4"
 outputd8 = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results\images_8"
 fp = r"C:\Users\Kevin Kyle\Desktop\It's NeRF or Nothin'!\results"
+
+#Defining variables from blender workspace
 scene = bpy.context.scene
 camera = bpy.context.scene.camera
-camera_extr_dict = []
+fileformat = "PNG" #JPEG or PNG
+
+#Script parameters
 numpics = 10
 camera_radius = 20#Distance from the central object
 res_x = 1920
 res_y = 1120
 
+# Check if light with the given name exists
+light_name = "MyLightObject"
+light_object = bpy.data.objects.get(light_name)
 
-# Create a new light datablock
-light_data = bpy.data.lights.new(name="MyLight", type='POINT')
-# Create a new object with the light datablock
-light_object = bpy.data.objects.new(name="MyLightObject", object_data=light_data)
-# Link the light object to the scene
-scene = bpy.context.scene
-scene.collection.objects.link(light_object)
-# Set light properties (optional)
-light_object.location = (0, 0, 5)  # Example location
-light_data.energy = 100  # Example light intensity
+
+if light_object is None:
+    # If light doesn't exist, create a new one
+    # Create a new light datablock
+    light_data = bpy.data.lights.new(name=light_name, type='POINT')
+    # Create a new object with the light datablock
+    light_object = bpy.data.objects.new(name="MyLightObject", object_data=light_data)
+    bpy.context.scene.collection.objects.link(light_object)
+    # Set light properties (optional)
+    light_object.location = (0, 0, 5)  # Example location
+    light_data.energy = 500  # Example light intensity
+    print("Light configured")
+else:
+    print("Light already exists in the scene:", light_name)
+
 
 #Conversion between camera view and world view
 def listify_matrix(matrix):
@@ -108,14 +120,9 @@ def get_camera_intrinsics(scene, camera):
         return {'camera_angle_x': camera_angle_x} if scene.nerf else camera_intr_dict
 
 
-
-    # function from original nerf 360_view.py code for blender
    
     # camera extrinsics (transform matrices)
-#Obtain camera transform
 def get_camera_extrinsics(camera, filepath):
-        #filename = os.path.basename( scene.render.frame_path(frame=frame) )
-        #filedir = OUTPUT_TRAIN * (mode == 'TRAIN') + OUTPUT_TEST * (mode == 'TEST')
 
         frame_data = {
                 'file_path': filepath,
@@ -123,21 +130,26 @@ def get_camera_extrinsics(camera, filepath):
         }
         return frame_data
         
-
-
+## FOR SCALING/RENDERING IMAGES
+def renderImage(downScale: int, location, index:int):
+    scene.render.resolution_x = res_x//downScale
+    scene.render.resolution_y = res_y//downScale
+    if(fileformat == "PNG"):
+        bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
+        bpy.context.scene.render.film_transparent = True
+        bpy.context.scene.render.filepath = join(location, "render_{}.png".format(index + 1))
+    else:
+        bpy.context.scene.render.filepath = join(location, "render_{}.jpeg".format(index + 1))
+    # Render the image
+    bpy.ops.render.render(write_still=True)
 
 out_data = get_camera_intrinsics(scene, camera)
 out_data['frames'] = []
 obj = bpy.data.objects.get('model')
-# Create the output directory if it doesn't exist
-#if not exists(output_directory):
-#    os.makedirs(output_directory)
-
-
 
 # Set rendering settings
-bpy.context.scene.render.image_settings.file_format = 'PNG'
-bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
+bpy.context.scene.render.image_settings.file_format = fileformat
+#bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
 bpy.context.scene.render.film_transparent = True
 #bpy.context.scene.render.filepath = os.path.join(fp, "render_")
 
@@ -162,37 +174,17 @@ for i in range(0, numpics):
     # Set the camera rotation using the quaternion
     bpy.context.scene.camera.rotation_euler = rot_quat.to_euler()
 
-    #scene.render.resolution_percentage = 100
-    scene.render.resolution_x = res_x
-    scene.render.resolution_y = res_y
-    # Increment the file name for each image
-    bpy.context.scene.render.filepath = join(output_directory, "render_{}.png".format(i + 1))
-    # Render the image
-    bpy.ops.render.render(write_still=True)
+    # Save/scale images and their orientation
+    renderImage(1, outputd1, i)
+    renderImage(2, outputd2, i)
+    renderImage(4, outputd4, i)
+    renderImage(8, outputd8, i)
 
-## FOR DOWNSCALING IMAGES to 1/4th original    
-    #scene.render.resolution_percentage = 25
-    scene.render.resolution_x = res_x//4
-    scene.render.resolution_y = res_y//4
-    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
-    bpy.context.scene.render.film_transparent = True
-     # Increment the file name for each image
-    bpy.context.scene.render.filepath = join(outputd4, "render_{}.png".format(i + 1))
-    # Render the image
-    bpy.ops.render.render(write_still=True)
+    if(fileformat == "JPEG"):
+            out_data['frames'].append(get_camera_extrinsics(camera, "images/render_{}.jpeg".format(i + 1)))
+    else:
+         out_data['frames'].append(get_camera_extrinsics(camera, "images/render_{}.png".format(i + 1)))
 
-## FOR DOWNSCALING IMAGES to 1/8th original   
-    #scene.render.resolution_percentage = 12.5
-    scene.render.resolution_x = res_x//8
-    scene.render.resolution_y = res_y//8
-    bpy.context.scene.render.image_settings.color_mode = 'RGBA'  # Make sure to use RGBA for transparency
-    bpy.context.scene.render.film_transparent = True
-     # Increment the file name for each image
-    bpy.context.scene.render.filepath = join(outputd8, "render_{}.png".format(i + 1))
-    # Render the image
-    bpy.ops.render.render(write_still=True)
-
-    out_data['frames'].append(get_camera_extrinsics(camera, "images/render_{}.png".format(i + 1)))
 
 with open(fp + '/' + 'transforms.json', 'w') as out_file:
     json.dump(out_data, out_file, indent=4)
@@ -200,3 +192,5 @@ with open(fp + '/' + 'transforms.json', 'w') as out_file:
 # Reset the file path to avoid issues in future renders
 bpy.context.scene.render.filepath = ""
 print("Mission complete")
+
+
