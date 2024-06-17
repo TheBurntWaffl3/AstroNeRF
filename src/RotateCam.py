@@ -22,8 +22,8 @@ camera = bpy.context.scene.camera
 fileformat = "PNG" #JPEG or PNG
 
 #Script parameters
-numpics = 10
-camera_radius = 20#Distance from the central object
+numpics = 400
+camera_radius = 20 #Distance from the central object
 res_x = 1920
 res_y = 1120
 
