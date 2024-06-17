@@ -1,4 +1,6 @@
-#THIS VSCODE SCRIPT MUST BE RUN WITH THE BLENDER EXTENSION ADD ON, FAKE BLENDER MODULE IS ALSO REQUIRED
+#THIS VSCODE SCRIPT MUST BE RUN WITH THE BLENDER EXTENSION, FAKE BLENDER MODULE IS ALSO REQUIRED
+#Setup tutorial: https://www.youtube.com/watch?v=YUytEtaVrrc 
+#pip install fake-bpy-module-latest
 import bpy
 import os
 import math
@@ -117,7 +119,7 @@ def get_camera_intrinsics(scene, camera):
             #'aabb_scale': scene.aabb
         }
 
-        return {'camera_angle_x': camera_angle_x} if scene.nerf else camera_intr_dict
+        return camera_intr_dict
 
 
    
